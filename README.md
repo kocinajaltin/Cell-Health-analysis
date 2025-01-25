@@ -1,48 +1,48 @@
-# High-Content Imaging Analysis
+# Nanoparticle Toxicity Analysis Pipeline
 
-## Overview
-This repository contains Python scripts for analyzing high-content imaging data from 96-well plates. The analysis includes data preprocessing, visualization, and statistical computation for various particle exposures and concentrations. Key techniques include PCA (Principal Component Analysis), UMAP (Uniform Manifold Approximation and Projection), and heatmap generation for cell counts across wells.
+This repository contains a comprehensive Python-based pipeline for analyzing nanoparticle toxicity data. It includes various methodologies for data visualization, dimensionality reduction, and machine learning to uncover patterns and insights related to nanoparticle exposure and toxicity.
 
 ---
 
 ## Features
-1. **Batch Testing**:
-   - Generates heatmaps of cell counts across wells for multiple plates.
-   - Swaps and adjusts well counts as part of data curation.
 
-2. **Coefficient of Variation (CV) Analysis**:
-   - Calculates and visualizes the coefficient of variation across wells for each plate.
+### 1. **Data Preprocessing**
+- Summarizes cell counts based on well data.
+- Normalizes data using Z-scores.
+- Handles control wells (e.g., C03) separately for accurate comparisons.
 
-3. **Raw and Log-Transformed Data Visualization**:
-   - Creates histograms and calculates Cohen's d for raw and log-transformed feature data.
-   - Outputs descriptive statistics for specified wells.
+### 2. **Visualization**
+- **Heatmaps**: Generate heatmaps of cell counts across 96-well plates.
+- **Histograms**: Analyze feature distributions using matplotlib and scipy.
+- **Dimensionality Reduction**:
+  - **PCA**: Principal Component Analysis for visualizing variance.
+  - **UMAP**: Uniform Manifold Approximation and Projection for clustering.
 
-4. **Z-Score Normalization**:
-   - Implements normalization for data comparison across biological replicates.
+### 3. **Machine Learning Models**
+- **XGBoost**: Gradient boosting for toxicity prediction.
+- **KNN**: K-Nearest Neighbors for classification.
+- **MLP**: Multi-Layer Perceptron for deep learning-based analysis.
 
-5. **UMAP Analysis**:
-   - Projects high-dimensional data to 2D space using UMAP.
-   - Generates scatter plots for control wells and particles across concentrations.
+### 4. **Statistical Analysis**
+- Performs LD50 extrapolation using a three-parameter logistic model.
+- Handles cases where responses at the highest concentration do not drop below 50%.
 
-6. **PCA Analysis**:
-   - Performs PCA on selected features to reduce dimensionality.
-   - Visualizes explained variance, cumulative variance, and PCA loadings.
-   - Generates pair plots for visualizing principal components by particle type and concentration.
-
-7. **PCA and UMAP Integration**:
-   - Combines PCA and UMAP to analyze data from multiple plates and concentrations.
+### 5. **Customizable Code**
+- Modular functions make it easy to extend or modify the pipeline for different datasets and analyses.
 
 ---
 
-## Usage
-### Prerequisites
-- Python 3.7+
-- Required libraries:
+## Prerequisites
+
+Before running the code, ensure you have the following installed:
+
+- Python 3.9 or later
+- Key Python libraries:
   - `numpy`
   - `pandas`
   - `matplotlib`
   - `seaborn`
-  - `scikit-learn`
+  - `scipy`
   - `umap-learn`
-  - `tqdm`
-
+  - `xgboost`
+  - `sklearn`
