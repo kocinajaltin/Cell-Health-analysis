@@ -1,22 +1,12 @@
 # Nanoparticle Toxicity Analysis Pipeline
 
-A Python-based workflow for analyzing nanoparticle toxicity using high-content imaging data. It includes automated data preprocessing, visualization, dimensionality reduction, and machine-learning models to explore cell-level responses across nanoparticles and concentrations.
+This repository contains a single Jupyter Notebook implementing a full workflow for analyzing nanoparticle toxicity using high-content imaging data. The notebook integrates data preprocessing, visualization, dimensionality reduction, and machine learning into one continuous analysis. Supplementary analyses (e.g., LD₅₀ estimation and some statistical summaries) were performed in Excel and are not part of the notebook code.
 
 ---
 
-## Repository Structure
+## Overview
 
-```
-├── data/                   # Raw and processed cell-level data
-├── scripts/                # Analysis scripts
-│   ├── preprocessing/      # Heatmaps, CV calculations, Z-score normalization
-│   ├── dimensionality/     # PCA and UMAP analyses
-│   ├── ml_models/          # XGBoost, KNN, and MLP models
-│   └── statistics/         # LD50 and feature variance analysis
-├── results/                # Figures and exported CSV summaries
-├── notebooks/              # Exploratory notebooks (optional)
-└── README.md               # Project documentation
-```
+The notebook processes cell-level data collected from 96-well plates to investigate the effects of different nanoparticles and concentrations on cellular morphology. It includes visual and statistical tools to explore exposure–response patterns.
 
 ---
 
@@ -25,53 +15,58 @@ A Python-based workflow for analyzing nanoparticle toxicity using high-content i
 ### **Plate-wise Heatmaps**
 
 Generates 96-well heatmaps showing cell count distributions per plate.
-*Example output:*
 
+**Generated in code:** `generate_heatmap()`
+
+* Counts the number of cells per well.
+* Displays plate uniformity and identifies abnormal wells (e.g., low counts, edge effects).
+
+*Example outputs:*
 ![Plate 1 Heatmap](results/plate1_heatmap.png)
 ![Plate 2 Heatmap](results/plate2_heatmap.png)
 ![Plate 3 Heatmap](results/plate3_heatmap.png)
-
-**Function:** `generate_heatmap()`
-
-* Annotates each well with cell counts.
-* Highlights abnormal wells (e.g., edge effects or missing data).
-* Optionally switches or corrects mislabeled wells.
 
 ---
 
 ### **Coefficient of Variation (CV) Across Plates**
 
-Evaluates inter-plate reproducibility by computing mean, SD, and CV for each well.
+Calculates and visualizes variability across replicates.
 
-| Well | Mean | SD  | CV    |
-| ---- | ---- | --- | ----- |
-| A01  | 204  | 16  | 0.078 |
-| B01  | 190  | 14  | 0.074 |
-| ...  | ...  | ... | ...   |
+* Computes mean, standard deviation, and coefficient of variation (CV) per well.
+* Plots a heatmap of CV values across the 96-well format.
 
-*Visualization placeholder:*
+*Example output:*
 ![CV Heatmap](results/coefficient_variation_heatmap.png)
+
+| Well | Mean | SD | CV    |
+| ---- | ---- | -- | ----- |
+| A01  | 204  | 16 | 0.078 |
+| B01  | 190  | 14 | 0.074 |
 
 ---
 
 ## 2. Feature Distribution Analysis
 
-### **Raw vs Log-Transformed Histograms**
+### **Raw and Log-Transformed Histograms**
 
-Visualizes feature distributions (e.g., *Feature Area*) before and after log transformation.
-Also computes descriptive statistics and Cohen’s *d* for selected wells.
+Visualizes distributions of quantitative imaging features (e.g., *Feature Area*) before and after log transformation.
 
-**Output Table:**
+**Generated in code:** `generate_combined_histograms_and_stats_with_cohen_d()`
+
+* Creates histograms of raw and log-transformed data.
+* Calculates descriptive statistics (mean, SD) and Cohen’s *d* for selected wells.
+* Saves outputs as CSV files.
+
+*Example outputs:*
+![Raw Histogram](results/raw_histogram.png)
+![Log Histogram](results/log_histogram.png)
+
+**Output table:**
 
 | Well | Mean (log) | SD (log) | Cohen’s *d* |
 | ---- | ---------- | -------- | ----------- |
 | B03  | 0.48       | 0.12     | 2.01        |
 | D03  | 0.51       | 0.13     | 2.37        |
-
-**Figures:**
-
-* ![Raw Histogram](results/raw_histogram.png)
-* ![Log Histogram](results/log_histogram.png)
 
 ---
 
@@ -79,37 +74,24 @@ Also computes descriptive statistics and Cohen’s *d* for selected wells.
 
 ### **Principal Component Analysis (PCA)**
 
-Performs PCA to identify features driving cell morphology variance across nanoparticles or concentrations.
+Identifies features contributing to the largest variance in cell morphology.
 
-**Outputs:**
+* Uses `scikit-learn` PCA on standardized features.
+* Visualizes pairplots colored by nanoparticle type or concentration.
+* Displays loading heatmaps and variance plots.
 
-* Pairwise component plots (colored by particle or concentration)
-  ![PCA Pairplot](results/pca_pairplot.png)
-* Feature loadings heatmap
-  ![PCA Loadings](results/pca_loadings.png)
-* Explained-variance summary:
-
-| PC | Individual Var (%) | Cumulative Var (%) |
-| -- | ------------------ | ------------------ |
-| 1  | 42.5               | 42.5               |
-| 2  | 21.3               | 63.8               |
-| 3  | 14.2               | 78.0               |
-| 4  | 9.7                | 87.7               |
-| 5  | 5.6                | 93.3               |
-
----
+*Example outputs:*
+![PCA Pairplot](results/pca_pairplot.png)
+![PCA Loadings](results/pca_loadings.png)
 
 ### **Uniform Manifold Approximation and Projection (UMAP)**
 
-Embeds single-cell data into 2D space for visualizing exposure clusters.
+Projects multidimensional data into two dimensions for visualizing exposure clusters.
 
-**Scripts:**
+* Conducted both per plate and for combined data.
+* Generates scatter plots for single and multiple nanoparticle types.
 
-* `prep_umap_data.py` → plate-specific UMAP embedding
-* `umap_all_particles.py` → combined view of all nanoparticles
-* `umap_single_particle.py` → concentration-series per particle
-
-**Example outputs:**
+*Example outputs:*
 ![UMAP All Particles](results/umap_all_particles.png)
 ![UMAP CuO Single Particle](results/umap_cuo_single_particle.png)
 
@@ -117,54 +99,47 @@ Embeds single-cell data into 2D space for visualizing exposure clusters.
 
 ## 4. Machine-Learning Models
 
-### **Model Types**
+Implements classification models to distinguish control vs treated samples using cell morphology features.
 
-| Model            | Purpose                                                             | Key Metrics                              |
-| ---------------- | ------------------------------------------------------------------- | ---------------------------------------- |
-| XGBoost          | Gradient boosting classifier for control vs compound discrimination | Accuracy, Precision, Recall, F1, ROC-AUC |
-| KNN              | Distance-based classifier for small-sample validation               | Accuracy, ROC-AUC                        |
-| MLP *(optional)* | Deep-learning model for nonlinear response mapping                  | Loss, Validation Accuracy                |
+### **Models in Code**
 
-**Evaluation plots (per dosage):**
+| Model   | Description                                          | Metrics                                  |
+| ------- | ---------------------------------------------------- | ---------------------------------------- |
+| XGBoost | Gradient boosting classifier for toxicity prediction | Accuracy, Precision, Recall, F1, ROC-AUC |
+| KNN     | K-Nearest Neighbors for label-based classification   | Accuracy, ROC-AUC                        |
 
-* Confusion matrices
-  ![Confusion Matrix Example](results/confusion_matrix_dose.png)
-* Feature importance bars
-  ![Feature Importance](results/feature_importance_dose.png)
-* Metric comparison charts
-  ![Model Metrics](results/ml_metrics_plot.png)
+Each model outputs confusion matrices, feature importance plots, and performance summaries.
+
+*Example outputs:*
+![Confusion Matrix Example](results/confusion_matrix_dose.png)
+![Feature Importance](results/feature_importance_dose.png)
+
+**Supplementary:** Deep learning (MLP) and LD₅₀ modeling were explored in Excel and are not included in the Jupyter code.
 
 ---
 
-## 5. Statistical Modeling
+## 5. Supplementary Analyses (Excel)
 
-### **LD₅₀ Estimation**
-
-Fits a three-parameter logistic regression to determine the concentration causing 50 % response reduction.
-Handles plateauing curves when max response > 50 %.
+Some calculations and curve fittings (e.g., LD₅₀ extrapolation, logistic modeling, and advanced statistics) were performed outside Python using Excel.
+Results from these analyses complement the notebook outputs but are not executable within the Jupyter environment.
 
 ![LD50 Curve Example](results/ld50_curve.png)
 
 ---
 
-## 6. Example Workflow
+## 6. Running the Notebook
+
+The workflow is contained in a single Jupyter Notebook file. Run each section sequentially to reproduce the full analysis.
 
 ```bash
-# Preprocess and normalize raw well data
-
-# Generate QC heatmaps and CV analysis
-
-# Run PCA and UMAP for dimensionality reduction
-
-# Train machine-learning classifiers
-
+jupyter notebook nanoparticle_analysis.ipynb
 ```
 
 ---
 
 ## 7. Dependencies
 
-Requires **Python 3.9 +** and the following packages:
+Requires **Python 3.9+** and the following packages:
 
 ```
 numpy
@@ -178,7 +153,7 @@ umap-learn
 tqdm
 ```
 
-Install with:
+Install dependencies via:
 
 ```bash
 pip install -r requirements.txt
@@ -186,18 +161,19 @@ pip install -r requirements.txt
 
 ---
 
-## 8. Results Overview
+## 8. Outputs Summary
 
-| Analysis   | Output               | File                                        |
-| ---------- | -------------------- | ------------------------------------------- |
-| Heatmaps   | PNG                  | `results/plate*_heatmap.png`                |
-| CV Heatmap | PNG                  | `results/coefficient_variation_heatmap.png` |
-| PCA        | Pairplots + loadings | `results/pca_*`                             |
-| UMAP       | 2D projections       | `results/umap_*`                            |
-| ML metrics | JSON / CSV           | `results/model_metrics.csv`                 |
+| Analysis                 | Output Type                 | Example File                              |
+| ------------------------ | --------------------------- | ----------------------------------------- |
+| Heatmaps                 | PNG                         | results/plate*_heatmap.png                |
+| Coefficient of Variation | PNG                         | results/coefficient_variation_heatmap.png |
+| PCA                      | Pairplots, loadings         | results/pca_*                             |
+| UMAP                     | 2D projections              | results/umap_*                            |
+| Machine Learning         | Metrics, confusion matrices | results/model_*                           |
+| Supplementary (Excel)    | LD₅₀ curves, summaries      | results/excel_outputs/*                   |
 
 ---
 
 ## 9. Citation
 
-If you use this pipeline, please cite this repository and acknowledge the nanoparticle toxicity analysis workflow.
+If you use this notebook or its derived analyses, please cite this repository and acknowledge the nanoparticle toxicity analysis workflow.
