@@ -151,18 +151,13 @@ Handles plateauing curves when max response > 50 %.
 
 ```bash
 # Preprocess and normalize raw well data
-python scripts/preprocessing/preprocess_data.py
 
 # Generate QC heatmaps and CV analysis
-python scripts/preprocessing/generate_heatmaps.py
 
 # Run PCA and UMAP for dimensionality reduction
-python scripts/dimensionality/pca_analysis.py
-python scripts/dimensionality/umap_analysis.py
 
 # Train machine-learning classifiers
-python scripts/ml_models/xgboost_classifier.py
-python scripts/ml_models/knn_classifier.py
+
 ```
 
 ---
